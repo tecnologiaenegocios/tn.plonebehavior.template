@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configure
+    xmlns="http://namespaces.zope.org/zope"
+    xmlns:grok="http://namespaces.zope.org/grok"
+    xmlns:plone="http://namespaces.plone.org/plone"
+    i18n_domain="tn.plonebehavior.template"
+    >
+
+  <grok:grok package="." />
+
+  <plone:behavior
+      title="Template"
+      description="Configure the content as a template"
+      provides=".ITemplateConfiguration"
+      marker=".interfaces.IPossibleTemplate"
+      factory=".TemplateConfiguration"
+      />
+
+  <plone:behavior
+      title="Templating"
+      description="Attach a template to the content"
+      provides=".ITemplating"
+      marker=".ITemplatingMarker"
+      factory=".Templating"
+      />
+
+</configure>
