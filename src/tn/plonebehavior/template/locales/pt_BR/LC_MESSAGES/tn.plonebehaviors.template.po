@@ -1,0 +1,44 @@
+# --- PLEASE EDIT THE LINES BELOW CORRECTLY ---
+# SOME DESCRIPTIVE TITLE.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"POT-Creation-Date: 2012-06-15 23:57+0000\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI +ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=1; plural=0\n"
+"Language-Code: en\n"
+"Language-Name: English\n"
+"Preferred-Encodings: utf-8 latin1\n"
+"Domain: tn.plonebehaviors.template\n"
+
+#: ./interfaces.py:38
+msgid "Body"
+msgstr "Corpo"
+
+#: ./__init__.py:31
+#: ./interfaces.py:32
+msgid "HTML"
+msgstr "HTML"
+
+#: ./__init__.py:86
+msgid "Template"
+msgstr "Modelo"
+
+#: ./__init__.py:35
+msgid "The XPath expression which selects the element where the content will go to."
+msgstr "A expressão XPath que seleciona o elemento onde o conteúdo será inserido."
+
+#: ./__init__.py:87
+msgid "The content item which will be the template for this one"
+msgstr "O ítem de conteúdo que será o modelo para este"
+
+#: ./__init__.py:34
+msgid "XPath selector"
+msgstr "Seletor XPath"
+
