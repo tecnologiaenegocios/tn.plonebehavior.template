@@ -15,7 +15,7 @@ msgstr ""
 "Language-Code: en\n"
 "Language-Name: English\n"
 "Preferred-Encodings: utf-8 latin1\n"
-"Domain: tn.plonebehaviors.template\n"
+"Domain: tn.plonebehavior.template\n"
 
 #: ./interfaces.py:38
 msgid "Body"
