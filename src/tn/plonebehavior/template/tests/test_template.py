@@ -3,6 +3,7 @@ from plone.behavior.interfaces import IBehaviorAssignable
 from Products.CMFDefault.Document import Document
 from stubydoo import double
 from tn.plonebehavior.template import interfaces
+from tn.plonebehavior.template import IHasTemplate
 from tn.plonebehavior.template import ITemplating
 from tn.plonebehavior.template import ITemplatingMarker
 from tn.plonebehavior.template import ITemplateConfiguration
@@ -14,6 +15,7 @@ from tn.plonebehavior.template.tests import base
 from zope.annotation.interfaces import IAnnotations
 from zope.annotation.interfaces import IAttributeAnnotatable
 from zope.app.testing import placelesssetup
+from zope.interface import providedBy
 
 import stubydoo
 import unittest
@@ -127,6 +129,21 @@ class TestTemplating(unittest.TestCase):
     def test_persists_template_in_content_object_as_an_attribute(self):
         self.templating.template = 'A new template'
         self.assertEquals(self.context._templating_template, 'A new template')
+
+    def test_marks_the_content_when_template_is_set(self):
+        self.templating.template = 'A new template'
+        self.assertTrue(IHasTemplate in providedBy(self.context))
+
+    def test_unmarks_the_content_when_template_is_emptied(self):
+        self.templating.template = 'A new template'
+        self.templating.template = None
+        self.assertTrue(IHasTemplate not in providedBy(self.context))
+
+    def test_doesnt_break_if_content_is_unmarked_when_template_is_emptied(self):
+        self.templating.template = 'A new template'
+        zope.interface.noLongerProvides(self.context, IHasTemplate)
+        self.templating.template = None
+        self.assertTrue(IHasTemplate not in providedBy(self.context))
 
 
 class TestTemplateConfigurationBehaviorRegistration(base.TestCase):

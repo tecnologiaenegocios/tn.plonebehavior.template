@@ -95,7 +95,8 @@ zope.interface.alsoProvides(ITemplating, form.IFormFieldProvider)
 
 
 class ITemplatingMarker(IHasRelations):
-    """Marker interface for content objects which have a template associated.
+    """Marker interface for content objects which can have a template
+    associated (that is, for which ITemplating behavior is active).
 
     This extends IHasRelations to also tell z3c.relationfield that the
     associated template must be cataloged.
@@ -109,6 +110,12 @@ class ITemplatingMarker(IHasRelations):
         source=possibleTemplates,
         required=False,
     )
+
+
+class IHasTemplate(zope.interface.Interface):
+    """Marker interface for content objects which actually have a template
+    associated.
+    """
 
 
 class Templating(object):
@@ -128,6 +135,10 @@ class Templating(object):
         def get(self):
             return getattr(self.context, '_templating_template', None)
         def set(self, value):
+            if value:
+                zope.interface.alsoProvides(self.context, IHasTemplate)
+            else:
+                zope.interface.noLongerProvides(self.context, IHasTemplate)
             self.context._templating_template = value
         return property(get, set)
 
