@@ -1,0 +1,39 @@
+<html
+    xmlns="http://www.w3.org/1999/xhtml"
+    xmlns:tal="http://xml.zope.org/namespaces/tal"
+    xmlns:metal="http://xml.zope.org/namespaces/metal"
+    xmlns:i18n="http://xml.zope.org/namespaces/i18n"
+    metal:use-macro="context/main_template/macros/master"
+    >
+
+<metal:block fill-slot="style_slot">
+  <link
+      rel="stylesheet"
+      media="all"
+      href=""
+      type="text/css"
+      tal:attributes="href view/stylesheet_url"
+      />
+</metal:block>
+
+<metal:block fill-slot="javascript_head_slot">
+  <script
+      type="text/javascript"
+      src=""
+      tal:attributes="src view/javascript_url"
+      ></script>
+</metal:block>
+
+<metal:block fill-slot="content-core">
+  <iframe
+      class="templated-page-view"
+      height="600"
+      src=""
+      tal:attributes="
+          src string:${context/absolute_url}/@@templated-view;
+          id  view/frame_id;
+      "
+      />
+</metal:block>
+
+</html>

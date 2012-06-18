@@ -1,4 +1,6 @@
 from five import grok
+from Products.CMFCore.utils import getToolByName
+from Products.Five import browser
 from persistent.dict import PersistentDict
 from plone.directives import form
 from plone.formwidget.contenttree.source import ObjPathSourceBinder
@@ -156,31 +158,48 @@ class Template(grok.Adapter):
         ).compile()
 
 
-class NullTemplate(object):
-    """A template which just returns normal item visualization.
-    """
-    grok.implements(interfaces.ITemplate)
-
-    def compile(self, context):
-        return zope.component.getMultiAdapter((context, getRequest()),
-                                              name=u'view')()
+class MissingTemplateError(StandardError):
+    pass
 
 
 def getTemplate(context):
+    """Get the template of the given content object.
+
+    The content object must have the ITemplating behavior active.
+    Return None if no template is found.
+    """
     possible_template = ITemplating(context).template
 
-    if possible_template is not None:
-        possible_template = possible_template.to_object
-    else:
-        possible_template = NullTemplate()
+    if possible_template is None:
+        return None
+
+    possible_template = possible_template.to_object
 
     return interfaces.ITemplate(possible_template)
 
 
 class TemplatedView(grok.View):
-    grok.context(ITemplatingMarker)
+    grok.context(IHasTemplate)
     grok.name('templated-view')
     grok.require('zope2.View')
 
     def render(self):
-        return getTemplate(self.context).compile(self.context)
+        template = getTemplate(self.context)
+        if template is not None:
+            return template.compile(self.context)
+        raise MissingTemplateError(u'Cannot found a template in this context.')
+
+
+# This view is not automatically registered.
+class DefaultView(browser.BrowserView):
+    index = browser.pagetemplatefile.ViewPageTemplateFile('template.pt')
+
+    def __call__(self):
+        portal_url = getToolByName(self.context, 'portal_url')()
+        base_resources_path = portal_url + '/++resource++tn.plonebehavior.template/'
+
+        self.frame_id = u'frame-%s' % self.context.__name__
+        self.javascript_url = base_resources_path + 'template.js'
+        self.stylesheet_url = base_resources_path + 'template.css'
+
+        return self.index()

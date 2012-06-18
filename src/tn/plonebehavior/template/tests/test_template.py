@@ -2,11 +2,13 @@ from plone.behavior.interfaces import IBehavior
 from plone.behavior.interfaces import IBehaviorAssignable
 from Products.CMFDefault.Document import Document
 from stubydoo import double
+from tn.plonebehavior.template import getTemplate
 from tn.plonebehavior.template import interfaces
 from tn.plonebehavior.template import IHasTemplate
 from tn.plonebehavior.template import ITemplating
 from tn.plonebehavior.template import ITemplatingMarker
 from tn.plonebehavior.template import ITemplateConfiguration
+from tn.plonebehavior.template import MissingTemplateError
 from tn.plonebehavior.template import Templating
 from tn.plonebehavior.template import TemplateConfiguration
 from tn.plonebehavior.template import Template
@@ -293,15 +295,54 @@ class TestTemplatedViewRendering(unittest.TestCase):
 
         self.assertEquals(self.view.render(), u'Compilation result')
 
-
     def test_context_without_template(self):
         self.templating_behavior.template = None
 
-        @zope.component.adapter(None, None)
-        @zope.interface.implementer(zope.publisher.interfaces.browser.IBrowserView)
-        def default_view(context, request):
-            return double(__call__=lambda x: u'Default view')
+        self.assertRaises(
+            MissingTemplateError,
+            self.view.render,
+        )
 
-        zope.component.provideAdapter(default_view, name=u'view')
 
-        self.assertEquals(self.view.render(), u'Default view')
+@stubydoo.assert_expectations
+class TestGetTemplateFunction(unittest.TestCase):
+
+    def setUp(self):
+        placelesssetup.setUp(self)
+
+        self.context = double()
+        self.templating_behavior = double(template=None)
+
+        @zope.component.adapter(None)
+        @zope.interface.implementer(ITemplating)
+        def templating_behavior(context):
+            return self.templating_behavior
+
+        zope.component.provideAdapter(templating_behavior)
+        self.view = TemplatedView(self.context, 'a request')
+
+    def tearDown(self):
+        placelesssetup.tearDown()
+
+    def test_context_with_template_set(self):
+        template_content = double()
+        template_relation = double(to_object=template_content)
+
+        zope.interface.alsoProvides(template_content,
+                                    interfaces.IPossibleTemplate)
+
+        self.templating_behavior.template = template_relation
+
+        template = double()
+        @zope.component.adapter(interfaces.IPossibleTemplate)
+        @zope.interface.implementer(interfaces.ITemplate)
+        def template_adapter(context):
+            return template
+
+        zope.component.provideAdapter(template_adapter)
+
+        self.assertTrue(getTemplate(self.context) is template)
+
+    def test_context_without_template(self):
+        self.templating_behavior.template = None
+        self.assertTrue(getTemplate(self.context) is None)
