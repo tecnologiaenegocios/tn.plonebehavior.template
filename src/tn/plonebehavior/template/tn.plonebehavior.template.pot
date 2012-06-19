@@ -4,7 +4,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
-"POT-Creation-Date: 2012-06-15 23:57+0000\n"
+"POT-Creation-Date: 2012-06-19 18:40+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI +ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -15,30 +15,34 @@ msgstr ""
 "Language-Code: en\n"
 "Language-Name: English\n"
 "Preferred-Encodings: utf-8 latin1\n"
-"Domain: tn.plonebehaviors.template\n"
+"Domain: tn.plonebehavior.template\n"
 
 #: ./interfaces.py:38
 msgid "Body"
 msgstr ""
 
-#: ./__init__.py:31
+#: ./__init__.py:32
 #: ./interfaces.py:32
 msgid "HTML"
 msgstr ""
 
-#: ./__init__.py:86
+#: ./__init__.py:92
 msgid "Template"
 msgstr ""
 
-#: ./__init__.py:35
+#: ./__init__.py:36
+msgid "Template configuration"
+msgstr ""
+
+#: ./__init__.py:41
 msgid "The XPath expression which selects the element where the content will go to."
 msgstr ""
 
-#: ./__init__.py:87
+#: ./__init__.py:93
 msgid "The content item which will be the template for this one"
 msgstr ""
 
-#: ./__init__.py:34
+#: ./__init__.py:40
 msgid "XPath selector"
 msgstr ""
 

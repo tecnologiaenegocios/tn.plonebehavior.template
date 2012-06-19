@@ -9,7 +9,6 @@ from z3c.relationfield.interfaces import IHasRelations
 from zope.annotation.interfaces import IAnnotations
 from zope.annotation.interfaces import IAttributeAnnotatable
 from zope.i18nmessageid import MessageFactory
-from zope.globalrequest import getRequest
 
 import z3c.relationfield
 import zope.component
@@ -32,6 +31,11 @@ class ITemplateConfiguration(form.Schema):
     form.omitted('html')
     html = zope.schema.SourceText(title=_(u'HTML'))
 
+    form.fieldset(
+        'template-configuration',
+        label=_(u'Template configuration'),
+        fields=['xpath',],
+    )
     xpath = zope.schema.TextLine(
         title=_(u'XPath selector'),
         description=_(u'The XPath expression which selects the element where '

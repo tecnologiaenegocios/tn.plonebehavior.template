@@ -4,7 +4,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
-"POT-Creation-Date: 2012-06-15 23:57+0000\n"
+"POT-Creation-Date: 2012-06-19 18:40+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI +ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -21,24 +21,28 @@ msgstr ""
 msgid "Body"
 msgstr "Corpo"
 
-#: ./__init__.py:31
+#: ./__init__.py:32
 #: ./interfaces.py:32
 msgid "HTML"
 msgstr "HTML"
 
-#: ./__init__.py:86
+#: ./__init__.py:92
 msgid "Template"
 msgstr "Modelo"
 
-#: ./__init__.py:35
+#: ./__init__.py:36
+msgid "Template configuration"
+msgstr "Configuração de modelo"
+
+#: ./__init__.py:41
 msgid "The XPath expression which selects the element where the content will go to."
 msgstr "A expressão XPath que seleciona o elemento onde o conteúdo será inserido."
 
-#: ./__init__.py:87
+#: ./__init__.py:93
 msgid "The content item which will be the template for this one"
 msgstr "O ítem de conteúdo que será o modelo para este"
 
-#: ./__init__.py:34
+#: ./__init__.py:40
 msgid "XPath selector"
 msgstr "Seletor XPath"
 
