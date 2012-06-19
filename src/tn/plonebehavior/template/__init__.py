@@ -10,6 +10,7 @@ from zope.annotation.interfaces import IAnnotations
 from zope.annotation.interfaces import IAttributeAnnotatable
 from zope.i18nmessageid import MessageFactory
 
+import lxml.cssselect
 import z3c.relationfield
 import zope.component
 import zope.interface
@@ -21,7 +22,8 @@ _ = MessageFactory('tn.plonebehavior.template')
 from tn.plonebehavior.template import interfaces
 
 
-default_xpath_selector = u"//*[@id='template-content']"
+default_css_selector = u"#template-content"
+default_xpath_selector = lxml.cssselect.CSSSelector(default_css_selector).path
 template_configuration_key = 'tn.plonebehavior.template.TemplateConfiguration'
 apply = lambda f: f()
 
@@ -34,12 +36,22 @@ class ITemplateConfiguration(form.Schema):
     form.fieldset(
         'template-configuration',
         label=_(u'Template configuration'),
-        fields=['xpath',],
+        fields=['css',],
     )
+    css = zope.schema.TextLine(
+        title=_(u'CSS selector'),
+        description=_(u'The CSS expression which selects the element where '
+                      u'the content will go to.'),
+        default=default_css_selector,
+        required=False
+    )
+
+    form.omitted('xpath')
     xpath = zope.schema.TextLine(
         title=_(u'XPath selector'),
         description=_(u'The XPath expression which selects the element where '
-                      u'the content will go to.'),
+                      u'the content will go to.  A CSS expression will '
+                      u'override this.'),
         default=default_xpath_selector,
         required=False
     )
@@ -69,9 +81,19 @@ class TemplateConfiguration(object):
     @apply
     def xpath():
         def get(self):
-            return self.annotations().get('xpath', None)
+            return self.annotations().get('xpath', default_xpath_selector)
         def set(self, value):
             self.annotations()['xpath'] = value
+        return property(get, set)
+
+    @apply
+    def css():
+        def get(self):
+            return self.annotations().get('css', default_css_selector)
+        def set(self, value):
+            xpath = lxml.cssselect.CSSSelector(value).path
+            self.annotations()['css'] = value
+            self.annotations()['xpath'] = xpath
         return property(get, set)
 
     def annotations(self):

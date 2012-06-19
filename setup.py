@@ -27,6 +27,7 @@ setup(
         'plone.directives.form',
         'plone.formwidget.contenttree',
         'z3c.relationfield',
+        'lxml',
     ],
     extras_require={
         'test': [
