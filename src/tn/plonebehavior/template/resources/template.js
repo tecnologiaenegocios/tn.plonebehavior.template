@@ -1,11 +1,8 @@
 ;(function($) {
-  $(function() {
+  $(window).load(function() {
     $('iframe.templated-page-view').each(function() {
       var $frame = $(this);
-      var $doc = $frame.contents();
-      var heightFn = function() { $frame.height($doc.find('html').height()); }
-      $doc.load(heightFn);
-      $doc.ready(heightFn);
+      $frame.height($frame.contents().find('html').height());
     });
   });
 })(jQuery);
