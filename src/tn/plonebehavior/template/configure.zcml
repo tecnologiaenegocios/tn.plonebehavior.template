@@ -8,6 +8,8 @@
     i18n_domain="tn.plonebehavior.template"
     >
 
+  <includeDependencies package="." />
+
   <grok:grok package="." />
 
   <plone:behavior
