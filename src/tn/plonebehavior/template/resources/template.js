@@ -3,7 +3,9 @@
     $('iframe.templated-page-view').each(function() {
       var $frame = $(this);
       var $doc = $frame.contents();
-      $doc.ready(function() { $frame.height($doc.find('html').height()); });
+      var heightFn = function() { $frame.height($doc.find('html').height()); }
+      $doc.load(heightFn);
+      $doc.ready(heightFn);
     });
   });
 })(jQuery);
