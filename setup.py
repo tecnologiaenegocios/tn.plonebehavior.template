@@ -23,10 +23,10 @@ setup(
         'setuptools',
         'Plone',
         'five.grok',
+        'plone.app.relationfield',
         'plone.behavior',
         'plone.directives.form',
         'plone.formwidget.contenttree',
-        'z3c.relationfield',
         'lxml',
     ],
     extras_require={
