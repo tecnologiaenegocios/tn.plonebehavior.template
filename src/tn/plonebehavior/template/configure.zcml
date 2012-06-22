@@ -16,7 +16,6 @@
       title="Template"
       description="Configure the content as a template"
       provides=".ITemplateConfiguration"
-      marker=".interfaces.IPossibleTemplate"
       factory=".TemplateConfiguration"
       />
 
@@ -24,7 +23,6 @@
       title="Templating"
       description="Attach a template to the content"
       provides=".ITemplating"
-      marker=".ITemplatingMarker"
       factory=".Templating"
       />
 

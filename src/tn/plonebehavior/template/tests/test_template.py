@@ -6,13 +6,13 @@ from tn.plonebehavior.template import getTemplate
 from tn.plonebehavior.template import interfaces
 from tn.plonebehavior.template import IHasTemplate
 from tn.plonebehavior.template import ITemplating
-from tn.plonebehavior.template import ITemplatingMarker
 from tn.plonebehavior.template import ITemplateConfiguration
 from tn.plonebehavior.template import MissingTemplateError
 from tn.plonebehavior.template import Templating
 from tn.plonebehavior.template import TemplateConfiguration
 from tn.plonebehavior.template import Template
 from tn.plonebehavior.template import TemplatedView
+from tn.plonebehavior.template.interfaces import IPossibleTemplate
 from tn.plonebehavior.template.tests import base
 from zope.annotation.interfaces import IAnnotations
 from zope.annotation.interfaces import IAttributeAnnotatable
@@ -94,6 +94,36 @@ class TestTemplateConfiguration(unittest.TestCase):
         self.assertEquals(other_configuration.xpath,
                           u"descendant-or-self::*[@id = 'other-id']")
 
+    def test_marks_the_content_when_xpath_is_set(self):
+        self.configuration.xpath = 'a Xpath expression'
+        self.assertTrue(IPossibleTemplate in providedBy(self.context))
+
+    def test_unmarks_the_content_when_xpath_is_emptied(self):
+        self.configuration.xpath = 'a XPath expression'
+        self.configuration.xpath = None
+        self.assertTrue(IPossibleTemplate not in providedBy(self.context))
+
+    def test_doesnt_break_if_content_is_unmarked_when_xpath_is_emptied(self):
+        self.configuration.xpath = 'a XPath expression'
+        zope.interface.noLongerProvides(self.context, IPossibleTemplate)
+        self.configuration.xpath = None
+        self.assertTrue(IPossibleTemplate not in providedBy(self.context))
+
+    def test_marks_the_content_when_css_is_set(self):
+        self.configuration.css = 'a CSS expression'
+        self.assertTrue(IPossibleTemplate in providedBy(self.context))
+
+    def test_unmarks_the_content_when_css_is_emptied(self):
+        self.configuration.css = 'a CSS expression'
+        self.configuration.css = None
+        self.assertTrue(IPossibleTemplate not in providedBy(self.context))
+
+    def test_doesnt_break_if_content_is_unmarked_when_css_is_emptied(self):
+        self.configuration.css = 'a CSS expression'
+        zope.interface.noLongerProvides(self.context, IPossibleTemplate)
+        self.configuration.css = None
+        self.assertTrue(IPossibleTemplate not in providedBy(self.context))
+
 
 @stubydoo.assert_expectations
 class TestTemplateAdapter(unittest.TestCase):
@@ -138,6 +168,17 @@ class TestTemplating(unittest.TestCase):
     def setUp(self):
         placelesssetup.setUp(self)
         self.context = double()
+
+        zope.interface.alsoProvides(self.context, IAttributeAnnotatable)
+        @zope.component.adapter(IAttributeAnnotatable)
+        @zope.interface.implementer(IAnnotations)
+        def annotations_adapter(context):
+            if hasattr(context, '_annotations'):
+                return context._annotations
+            context._annotations = {}
+            return context._annotations
+        zope.component.provideAdapter(annotations_adapter)
+
         self.templating = Templating(self.context)
 
     def tearDown(self):
@@ -146,9 +187,10 @@ class TestTemplating(unittest.TestCase):
     def test_defaults_template_to_none(self):
         self.assertTrue(self.templating.template is None)
 
-    def test_persists_template_in_content_object_as_an_attribute(self):
+    def test_persists_template_in_content_object(self):
         self.templating.template = 'A new template'
-        self.assertEquals(self.context._templating_template, 'A new template')
+        new_templating = Templating(self.context)
+        self.assertEquals(new_templating.template, 'A new template')
 
     def test_marks_the_content_when_template_is_set(self):
         self.templating.template = 'A new template'
@@ -168,107 +210,20 @@ class TestTemplating(unittest.TestCase):
 
 class TestTemplateConfigurationBehaviorRegistration(base.TestCase):
 
-    def afterSetUp(self):
-        super(TestTemplateConfigurationBehaviorRegistration, self).afterSetUp()
-
-        self.context = Document('document')
-        zope.interface.alsoProvides(self.context, IAttributeAnnotatable)
-        self.behavior_assignable_factory = None
-
-        # This will enable the behavior for our document.
-        class BehaviorAssignable(object):
-            zope.component.adapts(Document)
-            zope.interface.implements(IBehaviorAssignable)
-            def __init__(self, context):
-                self.context = context
-            def supports(self, behavior_interface):
-                return behavior_interface is ITemplateConfiguration
-            def enumerate_behaviors(self):
-                yield zope.component.queryUtility(
-                    IBehavior, name=ITemplateConfiguration.__identifier__
-                )
-
-        zope.component.provideAdapter(BehaviorAssignable)
-        self.behavior_assignable_factory = BehaviorAssignable
-
-    def beforeTearDown(self):
-        zope.component.getGlobalSiteManager().\
-                unregisterAdapter(self.behavior_assignable_factory)
-
     def test_behavior_is_registered(self):
         self.assertTrue(zope.component.queryUtility(
             IBehavior,
             name=ITemplateConfiguration.__identifier__
         ) is not None)
-
-    def test_behavior_has_correct_marker(self):
-        behavior = zope.component.queryUtility(
-            IBehavior,
-            name=ITemplateConfiguration.__identifier__
-        )
-        if behavior is None:
-            self.fail('behavior not registered')
-        else:
-            self.assertTrue(behavior.marker is interfaces.IPossibleTemplate)
-
-    def test_behavior_is_usable(self):
-        adapted = ITemplateConfiguration(self.context, None)
-        self.assertTrue(adapted is not None)
-
-
-@stubydoo.assert_expectations
-class TestTemplatingMarkerHasRelations(unittest.TestCase):
-    def runTest(self):
-        from z3c.relationfield.interfaces import IHasRelations
-        self.assertTrue(IHasRelations in ITemplatingMarker.__iro__)
 
 
 class TestTemplatingBehaviorRegistration(base.TestCase):
 
-    def afterSetUp(self):
-        super(TestTemplatingBehaviorRegistration, self).afterSetUp()
-
-        self.context = Document('document')
-        self.behavior_assignable_factory = None
-
-        # This will enable the behavior for our document.
-        class BehaviorAssignable(object):
-            zope.component.adapts(Document)
-            zope.interface.implements(IBehaviorAssignable)
-            def __init__(self, context):
-                self.context = context
-            def supports(self, behavior_interface):
-                return behavior_interface is ITemplating
-            def enumerate_behaviors(self):
-                yield zope.component.queryUtility(IBehavior,
-                                                  name=ITemplating.__identifier__)
-
-        zope.component.provideAdapter(BehaviorAssignable)
-        self.behavior_assignable_factory = BehaviorAssignable
-
-    def beforeTearDown(self):
-        zope.component.getGlobalSiteManager().\
-                unregisterAdapter(self.behavior_assignable_factory)
-
     def test_behavior_is_registered(self):
         self.assertTrue(zope.component.queryUtility(
             IBehavior,
             name=ITemplating.__identifier__
         ) is not None)
-
-    def test_behavior_has_correct_marker(self):
-        behavior = zope.component.queryUtility(
-            IBehavior,
-            name=ITemplating.__identifier__
-        )
-        if behavior is None:
-            self.fail('behavior not registered')
-        else:
-            self.assertTrue(behavior.marker is ITemplatingMarker)
-
-    def test_behavior_is_usable(self):
-        adapted = ITemplating(self.context, None)
-        self.assertTrue(adapted is not None)
 
 
 @stubydoo.assert_expectations
@@ -297,14 +252,13 @@ class TestTemplatedViewRendering(unittest.TestCase):
 
         self.templating_behavior.template = template_relation
 
-        zope.interface.alsoProvides(template_content,
-                                    interfaces.IPossibleTemplate)
+        zope.interface.alsoProvides(template_content, IPossibleTemplate)
 
         template = double()
         stubydoo.stub(template, 'compile').\
                 with_args(self.context).and_return(u'Compilation result')
 
-        @zope.component.adapter(interfaces.IPossibleTemplate)
+        @zope.component.adapter(IPossibleTemplate)
         @zope.interface.implementer(interfaces.ITemplate)
         def template_adapter(context):
             return template
@@ -346,13 +300,12 @@ class TestGetTemplateFunction(unittest.TestCase):
         template_content = double()
         template_relation = double(to_object=template_content)
 
-        zope.interface.alsoProvides(template_content,
-                                    interfaces.IPossibleTemplate)
+        zope.interface.alsoProvides(template_content, IPossibleTemplate)
 
         self.templating_behavior.template = template_relation
 
         template = double()
-        @zope.component.adapter(interfaces.IPossibleTemplate)
+        @zope.component.adapter(IPossibleTemplate)
         @zope.interface.implementer(interfaces.ITemplate)
         def template_adapter(context):
             return template

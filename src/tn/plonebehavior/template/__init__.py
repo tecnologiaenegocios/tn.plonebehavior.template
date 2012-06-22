@@ -25,6 +25,7 @@ from tn.plonebehavior.template import interfaces
 default_css_selector = u"#template-content"
 default_xpath_selector = lxml.cssselect.CSSSelector(default_css_selector).path
 template_configuration_key = 'tn.plonebehavior.template.TemplateConfiguration'
+templating_key = 'tn.plonebehavior.template.Templating'
 apply = lambda f: f()
 
 
@@ -83,6 +84,12 @@ class TemplateConfiguration(object):
         def get(self):
             return self.annotations().get('xpath', default_xpath_selector)
         def set(self, value):
+            if value:
+                zope.interface.alsoProvides(self.context,
+                                            interfaces.IPossibleTemplate)
+            else:
+                zope.interface.noLongerProvides(self.context,
+                                                interfaces.IPossibleTemplate)
             self.annotations()['xpath'] = value
         return property(get, set)
 
@@ -91,9 +98,12 @@ class TemplateConfiguration(object):
         def get(self):
             return self.annotations().get('css', default_css_selector)
         def set(self, value):
-            xpath = lxml.cssselect.CSSSelector(value).path
+            if value:
+                xpath = lxml.cssselect.CSSSelector(value).path
+                self.xpath = xpath
+            else:
+                self.xpath = None
             self.annotations()['css'] = value
-            self.annotations()['xpath'] = xpath
         return property(get, set)
 
     def annotations(self):
@@ -122,22 +132,15 @@ class ITemplating(form.Schema):
 zope.interface.alsoProvides(ITemplating, form.IFormFieldProvider)
 
 
-class ITemplatingMarker(IHasRelations):
-    """Marker interface for content objects which can have a template
+class ITemplatingMarker(zope.interface.Interface):
+    """BBB - kept here for compatibility.
+
+    Marker interface for content objects which can have a template
     associated (that is, for which ITemplating behavior is active).
 
     This extends IHasRelations to also tell z3c.relationfield that the
     associated template must be cataloged.
     """
-    # Since z3c.relationfield will do an attribute lookup to get the relations
-    # to index in its catalog, this field is declared by this interface,
-    # although it being just a marker provided by the object on which the
-    # behavior ITemplating is assigned, which in turn populates and manages
-    # this field.
-    _templating_template = z3c.relationfield.RelationChoice(
-        source=possibleTemplates,
-        required=False,
-    )
 
 
 class IHasTemplate(zope.interface.Interface):
@@ -150,7 +153,7 @@ class Templating(object):
     """Store a template in a content object.
     """
     grok.implements(ITemplating)
-    grok.adapts(IContentish)
+    grok.adapts(IAttributeAnnotatable)
 
     def __init__(self, context):
         self.context = context
@@ -161,14 +164,20 @@ class Templating(object):
     @apply
     def template():
         def get(self):
-            return getattr(self.context, '_templating_template', None)
+            return self.annotations().get('template')
         def set(self, value):
             if value:
                 zope.interface.alsoProvides(self.context, IHasTemplate)
             else:
                 zope.interface.noLongerProvides(self.context, IHasTemplate)
-            self.context._templating_template = value
+            self.annotations()['template'] = value
         return property(get, set)
+
+    def annotations(self):
+        annotations = IAnnotations(self.context)
+        if templating_key not in annotations:
+            annotations[templating_key] = PersistentDict()
+        return annotations[templating_key]
 
 
 class Template(grok.Adapter):
