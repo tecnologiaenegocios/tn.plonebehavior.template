@@ -4,8 +4,6 @@ from Products.Five import browser
 from persistent.dict import PersistentDict
 from plone.directives import form
 from plone.formwidget.contenttree.source import ObjPathSourceBinder
-from Products.CMFCore.interfaces import IContentish
-from z3c.relationfield.interfaces import IHasRelations
 from zope.annotation.interfaces import IAnnotations
 from zope.annotation.interfaces import IAttributeAnnotatable
 from zope.i18nmessageid import MessageFactory
