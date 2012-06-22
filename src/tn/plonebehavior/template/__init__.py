@@ -220,7 +220,7 @@ class TemplatedView(grok.View):
         template = getTemplate(self.context)
         if template is not None:
             return template.compile(self.context)
-        raise MissingTemplateError(u'Cannot found a template in this context.')
+        raise MissingTemplateError(u'Cannot find a template in this context.')
 
 
 # This view is not automatically registered.
