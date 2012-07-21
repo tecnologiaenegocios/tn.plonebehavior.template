@@ -2,8 +2,10 @@ from five import grok
 from Products.CMFCore.utils import getToolByName
 from Products.Five import browser
 from persistent.dict import PersistentDict
+from plone.app.dexterity.behaviors.metadata import ICategorization
 from plone.directives import form
 from plone.formwidget.contenttree.source import ObjPathSourceBinder
+from tn.plonebehavior.template import interfaces
 from zope.annotation.interfaces import IAnnotations
 from zope.annotation.interfaces import IAttributeAnnotatable
 from zope.i18nmessageid import MessageFactory
@@ -11,13 +13,12 @@ from zope.i18nmessageid import MessageFactory
 import lxml.cssselect
 import z3c.relationfield
 import zope.component
+import zope.globalrequest
 import zope.interface
 import zope.schema
 
 
 _ = MessageFactory('tn.plonebehavior.template')
-
-from tn.plonebehavior.template import interfaces
 
 
 default_css_selector = u"#template-content"
@@ -30,7 +31,7 @@ apply = lambda f: f()
 class ITemplateConfiguration(form.Schema):
 
     form.omitted('html')
-    html = zope.schema.SourceText(title=_(u'HTML'))
+    html = zope.schema.SourceText(title=_(u'HTML'), readonly=True)
 
     form.fieldset(
         'template-configuration',
@@ -59,6 +60,11 @@ class ITemplateConfiguration(form.Schema):
 zope.interface.alsoProvides(ITemplateConfiguration, form.IFormFieldProvider)
 
 
+class INullTemplateConfiguration(ITemplateConfiguration):
+    """A template configuration for null templates.
+    """
+
+
 class TemplateConfiguration(object):
     """Store template configuration attributes.
     """
@@ -68,14 +74,9 @@ class TemplateConfiguration(object):
     def __init__(self, context):
         self.context = context
 
-    @apply
-    def html():
-        def get(self):
-            return interfaces.IHTMLAttribute(self.context).html
-        def set(self, value):
-            # Do nothing, since this field is computed.
-            return
-        return property(get, set)
+    @property
+    def html(self):
+        return unicode(interfaces.IHTML(self.context))
 
     @apply
     def xpath():
@@ -116,6 +117,48 @@ possibleTemplates = ObjPathSourceBinder(dict(
 ))
 
 
+class NullTemplateConfiguration(object):
+    """A null template configuration.
+
+    This addresses the case of the content not having an associated
+    template.  A NullTemplate object is used then, and this is the
+    configuration used for such a template.
+    """
+    grok.implements(INullTemplateConfiguration)
+
+    xpath = u'//body'
+    css = u'body'
+
+    def __init__(self, context):
+        self.context = context
+
+    @property
+    def html(self):
+        return u"%(doctype)s\n<html %(html_attrs)s>%(head)s%(body)s</html>" % {
+            'doctype': u'<!DOCTYPE html>',
+            'html_attrs': u'lang="%s"' % self.get_language(),
+            'head': self.get_head(),
+            'body': u'<body></body>'
+        }
+
+    def get_language(self):
+        metadata = ICategorization(self.context, None)
+        if metadata and metadata.language:
+            return metadata.language
+        return self.get_language_from_portal()
+
+    def get_language_from_portal(self):
+        request = zope.globalrequest.getRequest()
+        portal_state = zope.component.getMultiAdapter(
+            (self.context, request),
+            name="plone_portal_state"
+        )
+        return portal_state.default_language()
+
+    def get_head(self):
+        return u"<head><title>%s</title></head>" % self.context.title
+
+
 class ITemplating(form.Schema):
 
     template = z3c.relationfield.RelationChoice(
@@ -124,6 +167,10 @@ class ITemplating(form.Schema):
                       u'one'),
         source=possibleTemplates,
         required=False
+    )
+
+    template_object = zope.interface.Attribute(
+        u'The underlying template object of the template relation'
     )
 
 
@@ -156,9 +203,6 @@ class Templating(object):
     def __init__(self, context):
         self.context = context
 
-    # Instead of storing the template in an annotation, we set an attribute in
-    # the content object, because this is the way z3c.relationfield will look
-    # for something to index in its catalog.
     @apply
     def template():
         def get(self):
@@ -171,6 +215,13 @@ class Templating(object):
             self.annotations()['template'] = value
         return property(get, set)
 
+    @property
+    def template_object(self):
+        possible_template = self.template
+        if possible_template is not None:
+            return possible_template.to_object
+        return NullTemplate(self.context)
+
     def annotations(self):
         annotations = IAnnotations(self.context)
         if templating_key not in annotations:
@@ -180,6 +231,9 @@ class Templating(object):
 
 class Template(grok.Adapter):
     """A template.
+
+    This object extracts configuration from a possible template and
+    delegates to a compilation strategy.
     """
     grok.context(interfaces.IPossibleTemplate)
     grok.implements(interfaces.ITemplate)
@@ -187,28 +241,44 @@ class Template(grok.Adapter):
     def compile(self, content):
         return zope.component.getMultiAdapter(
             (content, ITemplateConfiguration(self.context)),
-            interfaces.ITemplateCompiler
+            interfaces.ICompilationStrategy
         ).compile()
 
 
-class MissingTemplateError(StandardError):
-    pass
+class AssociatedTemplate(grok.Adapter):
+    """An associated template.
 
+    This object extracts a template from its context and delegates the
+    compilation task to it.
 
-def getTemplate(context):
-    """Get the template of the given content object.
-
-    The content object must have the ITemplating behavior active.
-    Return None if no template is found.
+    The context must have the ITemplating behavior active.
     """
-    possible_template = ITemplating(context).template
+    grok.context(IHasTemplate)
+    grok.implements(interfaces.ITemplate)
 
-    if possible_template is None:
-        return None
+    def compile(self, content):
+        template = self.get_template()
+        return template.compile(content)
 
-    possible_template = possible_template.to_object
+    def get_template(self):
+        possible_template = ITemplating(self.context).template_object
+        return interfaces.ITemplate(possible_template)
 
-    return interfaces.ITemplate(possible_template)
+
+class NullTemplate(object):
+    """A null template.
+
+    This kind of template just displays the content's body.  Delegates
+    to a compilation strategy multi adapting the content and self.
+    """
+    def __init__(self, context):
+        self.context = context
+
+    def compile(self, content):
+        return zope.component.getMultiAdapter(
+            (content, NullTemplateConfiguration(content)),
+            interfaces.ICompilationStrategy
+        ).compile()
 
 
 class TemplatedView(grok.View):
@@ -217,10 +287,8 @@ class TemplatedView(grok.View):
     grok.require('zope2.View')
 
     def render(self):
-        template = getTemplate(self.context)
-        if template is not None:
-            return template.compile(self.context)
-        raise MissingTemplateError(u'Cannot find a template in this context.')
+        template = interfaces.ITemplate(self.context)
+        return template.compile(self.context)
 
 
 # This view is not automatically registered.

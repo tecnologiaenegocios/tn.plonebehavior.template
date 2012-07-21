@@ -16,9 +16,9 @@ import lxml.html
 isiterable = lambda o: isinstance(o, collections.Iterable)
 
 
-class TemplateCompiler(grok.MultiAdapter):
+class CompilationStrategy(grok.MultiAdapter):
     grok.adapts(None, ITemplateConfiguration)
-    grok.implements(interfaces.ITemplateCompiler)
+    grok.implements(interfaces.ICompilationStrategy)
 
     def __init__(self, context, template_configuration):
         self.context = context
@@ -43,14 +43,14 @@ class TemplateCompiler(grok.MultiAdapter):
 
     def get_content(self):
         return lxml.html.fragments_fromstring(
-            interfaces.IBodyAttribute(self.context).body
+            unicode(interfaces.IHTMLBody(self.context))
         )
 
 
 if HAS_STYLED_PAGE:
-    class StyledPageTemplateCompiler(TemplateCompiler):
+    class StyledPageCompilationStrategy(CompilationStrategy):
         grok.adapts(styled_page.IStyledPageSchema, ITemplateConfiguration)
-        grok.implements(interfaces.ITemplateCompiler)
+        grok.implements(interfaces.ICompilationStrategy)
 
         def compile(self):
             tree = self.make_tree_with_content()

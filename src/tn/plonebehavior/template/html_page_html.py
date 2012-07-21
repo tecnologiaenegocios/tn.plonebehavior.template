@@ -9,9 +9,8 @@ except ImportError:
     HAS_HTML_PAGE = False
 
 if HAS_HTML_PAGE:
-    class HTMLPageHTMLAttribute(grok.Adapter):
+    class HTMLPageHTML(grok.Adapter):
         grok.context(html_page.IHTMLPageSchema)
-        grok.implements(interfaces.IHTMLAttribute)
-        @property
-        def html(self):
+        grok.implements(interfaces.IHTML)
+        def __unicode__(self):
             return self.context.html

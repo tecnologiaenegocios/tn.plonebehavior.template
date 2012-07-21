@@ -1,10 +1,11 @@
-from tn.plonebehavior.template import _
-
 import zope.interface
 
 
 class IPossibleTemplate(zope.interface.Interface):
     """Marker interface for objects which can be a template for another.
+
+    If something claims to provide this interface, it must be possible
+    to adapt it to ITemplate.
     """
 
 
@@ -17,7 +18,7 @@ class ITemplate(zope.interface.Interface):
         """
 
 
-class ITemplateCompiler(zope.interface.Interface):
+class ICompilationStrategy(zope.interface.Interface):
     """A template compiler
     """
 
@@ -26,28 +27,19 @@ class ITemplateCompiler(zope.interface.Interface):
         """
 
 
-class IHTMLAttribute(zope.interface.Interface):
-    """Something that has a HTML attribute.
+class IHTML(zope.interface.Interface):
+    """Something that represents a full-page HTML.
     """
-    html = zope.schema.SourceText(title=_(u'HTML'))
+
+    def __unicode__():
+        """The HTML as a unicode string.
+        """
 
 
-class IBodyAttribute(zope.interface.Interface):
+class IHTMLBody(zope.interface.Interface):
     """Something that has only stuff that normally goes into a <body> tag.
     """
-    body = zope.schema.SourceText(title=_(u'Body'))
 
-
-class IRenderer(zope.interface.Interface):
-    """Render a content.
-
-    This is intended to be used as an adapter for the content object in
-    "structure" expressions in view templates.
-    """
-
-    def render():
-        """Perform rendering.
-
-        If the content has a template, use it.  Otherwise, just return a
-        significant HTML representation of the content.
+    def __unicode__():
+        """The inner content of the body tag as a unicode string.
         """

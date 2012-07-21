@@ -1,16 +1,18 @@
+from stubydoo import double
 from tn.plonebehavior.template import interfaces
-from tn.plonebehavior.template.compiler import StyledPageTemplateCompiler
-from tn.plonebehavior.template.compiler import TemplateCompiler
+from tn.plonebehavior.template import NullTemplateConfiguration
+from tn.plonebehavior.template.compiler import StyledPageCompilationStrategy
+from tn.plonebehavior.template.compiler import CompilationStrategy
 from zope.app.testing import placelesssetup
-from zope.keyreference.interfaces import IKeyReference
 
-import zope.component
-import zope.interface
+import lxml.html
 import stubydoo
 import unittest
+import zope.component
+import zope.interface
 
 
-class TestTemplateCompiler(unittest.TestCase):
+class TestCompilationStrategy(unittest.TestCase):
 
     def setUp(self):
         placelesssetup.setUp(self)
@@ -20,13 +22,13 @@ class TestTemplateCompiler(unittest.TestCase):
         self.config = stubydoo.double()
 
         @zope.component.adapter(None)
-        @zope.interface.implementer(interfaces.IBodyAttribute)
+        @zope.interface.implementer(interfaces.IHTMLBody)
         def body_attribute(doc):
-            return stubydoo.double(body=doc.body)
+            return stubydoo.double(__unicode__=lambda self:doc.body)
 
         zope.component.provideAdapter(body_attribute)
 
-        self.compiler = TemplateCompiler(self.document, self.config)
+        self.compiler = CompilationStrategy(self.document, self.config)
 
     def tearDown(self):
         placelesssetup.tearDown()
@@ -100,7 +102,42 @@ class TestTemplateCompiler(unittest.TestCase):
         self.assertEquals(result, self.config.html)
 
 
-class TestStyledPageCompiler(unittest.TestCase):
+class TestCompilationStrategyWithNullConfiguration(unittest.TestCase):
+
+    def setUp(self):
+        placelesssetup.setUp(self)
+
+    def tearDown(self):
+        placelesssetup.tearDown()
+
+    def test_compilation_with_default_xpath_and_css(self):
+        context = double()
+        configuration = double(
+            xpath=NullTemplateConfiguration.xpath,
+            css=NullTemplateConfiguration.css,
+            html=u'<html><body></body></html>'
+        )
+
+        @zope.component.adapter(None)
+        @zope.interface.implementer(interfaces.IHTMLBody)
+        def body_adapter(context):
+            return double(__unicode__=lambda self:u'<p>Hello</p>')
+        zope.component.provideAdapter(body_adapter)
+
+        expected_body = u'<body><p>Hello</p></body>'
+
+        strategy = CompilationStrategy(context, configuration)
+        result = strategy.compile()
+        resulting_body = lxml.html.document_fromstring(result).\
+                xpath(u'//body')[0]
+
+        self.assertEquals(
+            expected_body,
+            lxml.html.tostring(resulting_body)
+        )
+
+
+class BaseTestStyledPageCompilationStrategy(unittest.TestCase):
 
     def setUp(self):
         placelesssetup.setUp(self)
@@ -111,7 +148,7 @@ class TestStyledPageCompiler(unittest.TestCase):
         self.document = stubydoo.double(body=stubydoo.double())
         self.document.body.output = u'<p>Test!</p>'
 
-        self.compiler = StyledPageTemplateCompiler(self.document, self.config)
+        self.compiler = StyledPageCompilationStrategy(self.document, self.config)
 
         # This 'stubbing' relies on the fact that the function is accessed
         # through module's getattr always, no references kept.
@@ -129,6 +166,9 @@ class TestStyledPageCompiler(unittest.TestCase):
         from tn.plonestyledpage import styled_page
         styled_page.getUniqueId = self.old_getUniqueId
         styled_page.getEscapedStyleBlock = self.old_getEscapedStyleBlock
+
+
+class TestStyledPageCompilationStrategy(BaseTestStyledPageCompilationStrategy):
 
     def test_element_selection(self):
         self.config.html = u"<html><head></head><body></body></html>"
@@ -249,3 +289,30 @@ class TestStyledPageCompiler(unittest.TestCase):
         result = self.compiler.compile()
 
         self.assertTrue(u'<head><style>p{color:red}</style></head>' in result)
+
+
+class TestStyledPageCompilationStrategyWithNullConfiguration(
+    BaseTestStyledPageCompilationStrategy
+):
+
+    def setUp(self):
+        super(TestStyledPageCompilationStrategyWithNullConfiguration,
+              self).setUp()
+        self.config = double(
+            xpath=NullTemplateConfiguration.xpath,
+            css=NullTemplateConfiguration.css,
+            html=u'<html><body></body></html>'
+        )
+        self.compiler = StyledPageCompilationStrategy(self.document, self.config)
+
+    def test_compilation_with_default_xpath_and_css(self):
+        expected_body = u'<body><div id="foo">%s</div></body>' % self.document.body.output
+
+        result = self.compiler.compile()
+        resulting_body = lxml.html.document_fromstring(result).\
+                xpath(u'//body')[0]
+
+        self.assertEquals(
+            expected_body,
+            lxml.html.tostring(resulting_body)
+        )
