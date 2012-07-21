@@ -68,5 +68,8 @@ if HAS_STYLED_PAGE:
         def get_content(self):
             id = styled_page.getUniqueId(self.context)
             return lxml.html.fragments_fromstring(
-                u'<div id="%s">%s</div>' % (id, self.context.body.output)
+                u'<div id="%s">%s</div>' % (
+                    id,
+                    unicode(interfaces.IHTMLBody(self.context))
+                )
             )

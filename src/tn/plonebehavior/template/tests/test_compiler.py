@@ -146,7 +146,13 @@ class BaseTestStyledPageCompilationStrategy(unittest.TestCase):
         # This kind of document uses a rich text field, which has an output
         # attribute.
         self.document = stubydoo.double(body=stubydoo.double())
-        self.document.body.output = u'<p>Test!</p>'
+        self.document.body = u'<p>Test!</p>'
+
+        @zope.component.adapter(None)
+        @zope.interface.implementer(interfaces.IHTMLBody)
+        def html_body(doc):
+            return doc.body
+        zope.component.provideAdapter(html_body)
 
         self.compiler = StyledPageCompilationStrategy(self.document, self.config)
 
@@ -306,7 +312,7 @@ class TestStyledPageCompilationStrategyWithNullConfiguration(
         self.compiler = StyledPageCompilationStrategy(self.document, self.config)
 
     def test_compilation_with_default_xpath_and_css(self):
-        expected_body = u'<body><div id="foo">%s</div></body>' % self.document.body.output
+        expected_body = u'<body><div id="foo">%s</div></body>' % self.document.body
 
         result = self.compiler.compile()
         resulting_body = lxml.html.document_fromstring(result).\
