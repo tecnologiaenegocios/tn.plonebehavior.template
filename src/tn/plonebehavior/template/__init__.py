@@ -17,6 +17,7 @@ import zope.globalrequest
 import zope.interface
 import zope.schema
 
+
 _ = MessageFactory('tn.plonebehavior.template')
 
 
@@ -303,10 +304,3 @@ class DefaultView(browser.BrowserView):
         self.stylesheet_url = base_resources_path + 'template.css'
 
         return self.index()
-
-
-# This forces grok to read this module.
-# TODO Split this module in smaller pieces so that this import could at least
-# go to the top of the file.  We could rely on Python's circular import
-# resolution, but then this note would not be written.
-import tn.plonebehavior.template.compilation_strategy
