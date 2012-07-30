@@ -1,8 +1,8 @@
 from stubydoo import double
 from tn.plonebehavior.template import interfaces
 from tn.plonebehavior.template import NullTemplateConfiguration
-from tn.plonebehavior.template.compiler import StyledPageCompilationStrategy
-from tn.plonebehavior.template.compiler import CompilationStrategy
+from tn.plonebehavior.template.compilation_strategy import StyledPageCompilationStrategy
+from tn.plonebehavior.template.compilation_strategy import CompilationStrategy
 from zope.app.testing import placelesssetup
 
 import lxml.html
