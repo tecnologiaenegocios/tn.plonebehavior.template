@@ -3,7 +3,6 @@ from tn.plonebehavior.template import interfaces
 from tn.plonebehavior.template import ITemplateConfiguration
 try:
     from tn.plonestyledpage import styled_page
-    styled_page # pyflakes
     HAS_STYLED_PAGE = True
 except ImportError:
     HAS_STYLED_PAGE = False
