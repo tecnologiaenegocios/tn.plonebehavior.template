@@ -33,7 +33,7 @@
           src string:${context/absolute_url}/@@templated-view;
           id  view/frame_id;
       "
-      />
+      ></iframe>
 </metal:block>
 
 </html>
