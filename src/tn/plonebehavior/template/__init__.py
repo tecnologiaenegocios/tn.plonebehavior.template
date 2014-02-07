@@ -5,6 +5,7 @@ from persistent.dict import PersistentDict
 from plone.app.dexterity.behaviors.metadata import ICategorization
 from plone.directives import form
 from plone.formwidget.contenttree.source import ObjPathSourceBinder
+from plone.supermodel import model
 from tn.plonebehavior.template import interfaces
 from zope.annotation.interfaces import IAnnotations
 from zope.annotation.interfaces import IAttributeAnnotatable
@@ -28,7 +29,7 @@ templating_key = 'tn.plonebehavior.template.Templating'
 apply = lambda f: f()
 
 
-class ITemplateConfiguration(form.Schema):
+class ITemplateConfiguration(model.Schema):
 
     form.omitted('html')
     html = zope.schema.SourceText(title=_(u'HTML'), readonly=True)
@@ -36,7 +37,7 @@ class ITemplateConfiguration(form.Schema):
     form.fieldset(
         'template-configuration',
         label=_(u'Template configuration'),
-        fields=['css',],
+        fields=['css'],
     )
     css = zope.schema.TextLine(
         title=_(u'CSS selector'),
@@ -82,6 +83,7 @@ class TemplateConfiguration(object):
     def xpath():
         def get(self):
             return self.annotations().get('xpath', default_xpath_selector)
+
         def set(self, value):
             if value:
                 zope.interface.alsoProvides(self.context,
@@ -96,6 +98,7 @@ class TemplateConfiguration(object):
     def css():
         def get(self):
             return self.annotations().get('css', default_css_selector)
+
         def set(self, value):
             if value:
                 xpath = lxml.cssselect.CSSSelector(value).path
@@ -159,7 +162,7 @@ class NullTemplateConfiguration(object):
         return u"<head><title>%s</title></head>" % self.context.title
 
 
-class ITemplating(form.Schema):
+class ITemplating(model.Schema):
 
     template = z3c.relationfield.RelationChoice(
         title=_(u'Template'),
@@ -207,6 +210,7 @@ class Templating(object):
     def template():
         def get(self):
             return self.annotations().get('template')
+
         def set(self, value):
             if value:
                 zope.interface.alsoProvides(self.context, IHasTemplate)
@@ -297,7 +301,9 @@ class DefaultView(browser.BrowserView):
 
     def __call__(self):
         portal_url = getToolByName(self.context, 'portal_url')()
-        base_resources_path = portal_url + '/++resource++tn.plonebehavior.template/'
+        base_resources_path = (
+            portal_url + '/++resource++tn.plonebehavior.template/'
+        )
 
         self.frame_id = u'frame-%s' % self.context.__name__
         self.javascript_url = base_resources_path + 'template.js'
