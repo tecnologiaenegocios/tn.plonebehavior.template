@@ -4,7 +4,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
-"POT-Creation-Date: 2012-06-19 19:16+0000\n"
+"POT-Creation-Date: 2014-02-20 21:13+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI +ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -17,40 +17,39 @@ msgstr ""
 "Preferred-Encodings: utf-8 latin1\n"
 "Domain: tn.plonebehavior.template\n"
 
-#: ./interfaces.py:38
-msgid "Body"
-msgstr ""
-
-#: ./__init__.py:42
+#: tn/plonebehavior/template/__init__.py:43
 msgid "CSS selector"
 msgstr ""
 
-#: ./__init__.py:34
-#: ./interfaces.py:32
+#: tn/plonebehavior/template/html_page_html.py:41
+msgid "Expression doesn't select a single element in the HTML page."
+msgstr ""
+
+#: tn/plonebehavior/template/__init__.py:35
 msgid "HTML"
 msgstr ""
 
-#: ./__init__.py:114
+#: tn/plonebehavior/template/__init__.py:176
 msgid "Template"
 msgstr ""
 
-#: ./__init__.py:38
+#: tn/plonebehavior/template/__init__.py:39
 msgid "Template configuration"
 msgstr ""
 
-#: ./__init__.py:43
+#: tn/plonebehavior/template/__init__.py:44
 msgid "The CSS expression which selects the element where the content will go to."
 msgstr ""
 
-#: ./__init__.py:52
+#: tn/plonebehavior/template/__init__.py:52
 msgid "The XPath expression which selects the element where the content will go to.  A CSS expression will override this."
 msgstr ""
 
-#: ./__init__.py:115
+#: tn/plonebehavior/template/__init__.py:177
 msgid "The content item which will be the template for this one"
 msgstr ""
 
-#: ./__init__.py:51
+#: tn/plonebehavior/template/__init__.py:51
 msgid "XPath selector"
 msgstr ""
 
