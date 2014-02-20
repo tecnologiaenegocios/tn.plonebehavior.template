@@ -115,7 +115,7 @@ class TemplateConfiguration(object):
         return annotations[template_configuration_key]
 
 
-possibleTemplates = ObjPathSourceBinder(dict(
+possibleTemplates = ObjPathSourceBinder(**dict(
     object_provides=interfaces.IPossibleTemplate.__identifier__
 ))
 
