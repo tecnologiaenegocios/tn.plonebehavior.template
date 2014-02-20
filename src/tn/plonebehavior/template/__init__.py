@@ -12,6 +12,7 @@ from zope.annotation.interfaces import IAttributeAnnotatable
 from zope.i18nmessageid import MessageFactory
 
 import lxml.cssselect
+import z3c.form.widget
 import z3c.relationfield
 import zope.component
 import zope.globalrequest
@@ -42,7 +43,6 @@ class ITemplateConfiguration(model.Schema):
         title=_(u'CSS selector'),
         description=_(u'The CSS expression which selects the element where '
                       u'the content will go to.'),
-        default=default_css_selector,
         required=False
     )
 
@@ -52,12 +52,23 @@ class ITemplateConfiguration(model.Schema):
         description=_(u'The XPath expression which selects the element where '
                       u'the content will go to.  A CSS expression will '
                       u'override this.'),
-        default=default_xpath_selector,
         required=False
     )
 
 
 zope.interface.alsoProvides(ITemplateConfiguration, form.IFormFieldProvider)
+
+
+grok.global_adapter(z3c.form.widget.StaticWidgetAttribute(
+    default_css_selector,
+    field=ITemplateConfiguration['css'],
+), name=u'default')
+
+
+grok.global_adapter(z3c.form.widget.StaticWidgetAttribute(
+    default_xpath_selector,
+    field=ITemplateConfiguration['xpath'],
+), name=u'default')
 
 
 class INullTemplateConfiguration(ITemplateConfiguration):
@@ -80,7 +91,7 @@ class TemplateConfiguration(object):
 
     @property
     def xpath(self):
-        return self.annotations().get('xpath', default_xpath_selector)
+        return self.annotations().get('xpath')
 
     @xpath.setter
     def xpath(self, value):
@@ -94,7 +105,7 @@ class TemplateConfiguration(object):
 
     @property
     def css(self):
-        return self.annotations().get('css', default_css_selector)
+        return self.annotations().get('css')
 
     @css.setter
     def css(self, value):

@@ -72,19 +72,11 @@ class TestTemplateConfiguration(unittest.TestCase):
 
         self.assertRaises(AttributeError, set_attribute)
 
-    def test_xpath_has_a_default_value(self):
-        self.assertEquals(self.configuration.xpath,
-                          u"descendant-or-self::*[@id = 'template-content']")
-
     def test_persists_xpath(self):
         self.configuration.xpath = u'A XPath expression'
 
         other_configuration = TemplateConfiguration(self.context)
         self.assertEquals(other_configuration.xpath, u'A XPath expression')
-
-
-    def test_css_has_a_default_value(self):
-        self.assertEquals(self.configuration.css, u'#template-content')
 
     def test_persists_css(self):
         self.configuration.css = u'#other-id'
