@@ -26,7 +26,6 @@ default_css_selector = u"#template-content"
 default_xpath_selector = lxml.cssselect.CSSSelector(default_css_selector).path
 template_configuration_key = 'tn.plonebehavior.template.TemplateConfiguration'
 templating_key = 'tn.plonebehavior.template.Templating'
-apply = lambda f: f()
 
 
 class ITemplateConfiguration(model.Schema):
@@ -79,34 +78,32 @@ class TemplateConfiguration(object):
     def html(self):
         return unicode(interfaces.IHTML(self.context))
 
-    @apply
-    def xpath():
-        def get(self):
-            return self.annotations().get('xpath', default_xpath_selector)
+    @property
+    def xpath(self):
+        return self.annotations().get('xpath', default_xpath_selector)
 
-        def set(self, value):
-            if value:
-                zope.interface.alsoProvides(self.context,
+    @xpath.setter
+    def xpath(self, value):
+        if value:
+            zope.interface.alsoProvides(self.context,
+                                        interfaces.IPossibleTemplate)
+        else:
+            zope.interface.noLongerProvides(self.context,
                                             interfaces.IPossibleTemplate)
-            else:
-                zope.interface.noLongerProvides(self.context,
-                                                interfaces.IPossibleTemplate)
-            self.annotations()['xpath'] = value
-        return property(get, set)
+        self.annotations()['xpath'] = value
 
-    @apply
-    def css():
-        def get(self):
-            return self.annotations().get('css', default_css_selector)
+    @property
+    def css(self):
+        return self.annotations().get('css', default_css_selector)
 
-        def set(self, value):
-            if value:
-                xpath = lxml.cssselect.CSSSelector(value).path
-                self.xpath = xpath
-            else:
-                self.xpath = None
-            self.annotations()['css'] = value
-        return property(get, set)
+    @css.setter
+    def css(self, value):
+        if value:
+            xpath = lxml.cssselect.CSSSelector(value).path
+            self.xpath = xpath
+        else:
+            self.xpath = None
+        self.annotations()['css'] = value
 
     def annotations(self):
         annotations = IAnnotations(self.context)
@@ -206,18 +203,17 @@ class Templating(object):
     def __init__(self, context):
         self.context = context
 
-    @apply
-    def template():
-        def get(self):
-            return self.annotations().get('template')
+    @property
+    def template(self):
+        return self.annotations().get('template')
 
-        def set(self, value):
-            if value:
-                zope.interface.alsoProvides(self.context, IHasTemplate)
-            else:
-                zope.interface.noLongerProvides(self.context, IHasTemplate)
-            self.annotations()['template'] = value
-        return property(get, set)
+    @template.setter
+    def template(self, value):
+        if value:
+            zope.interface.alsoProvides(self.context, IHasTemplate)
+        else:
+            zope.interface.noLongerProvides(self.context, IHasTemplate)
+        self.annotations()['template'] = value
 
     @property
     def template_object(self):
