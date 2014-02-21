@@ -154,10 +154,12 @@ class TestNullTemplateConfiguration(unittest.TestCase):
 
     def test_get_language_from_portal_if_content_has_no_language(self):
         self.metadata = None
-        portal_state_view = double(default_language=lambda self:'mayan')
+        portal_state_view = double(default_language=lambda self: 'mayan')
 
         @zope.component.adapter(None, None)
-        @zope.interface.implementer(zope.publisher.interfaces.browser.IBrowserView)
+        @zope.interface.implementer(
+            zope.publisher.interfaces.browser.IBrowserView
+        )
         def view(context, request):
             return portal_state_view
         zope.component.provideAdapter(view, name=u'plone_portal_state')
@@ -181,14 +183,17 @@ class TestTemplateAdapter(unittest.TestCase):
         class CompilationStrategy(object):
             zope.component.adapts(None, ITemplateConfiguration)
             zope.interface.implements(interfaces.ICompilationStrategy)
+
             def __init__(self, content, config):
                 self.context, self.config = content, config
+
             def compile(self):
                 return self.config.html % self.context.body
 
         class Configuration(object):
             zope.component.adapts(IAttributeAnnotatable)
             zope.interface.implements(ITemplateConfiguration)
+
             def __init__(self, context):
                 self.html = u'html(%s)'
 
@@ -227,6 +232,7 @@ class TestAssociatedTemplateCompilationAdapter(unittest.TestCase):
         zope.component.provideAdapter(templating_behavior)
 
         template = double()
+
         @zope.component.adapter(IPossibleTemplate)
         @zope.interface.implementer(interfaces.ITemplate)
         def template_adapter(context):
@@ -261,7 +267,7 @@ class TestNullTemplateAdapter(unittest.TestCase):
 
         zope.component.provideAdapter(compilation_strategy)
         stub(self.compilation_strategy, 'compile').\
-                and_return('Compilation results')
+            and_return('Compilation results')
 
     def tearDown(self):
         placelesssetup.tearDown()
@@ -293,6 +299,7 @@ class TestTemplating(unittest.TestCase):
         self.context = double()
 
         zope.interface.alsoProvides(self.context, IAttributeAnnotatable)
+
         @zope.component.adapter(IAttributeAnnotatable)
         @zope.interface.implementer(IAnnotations)
         def annotations_adapter(context):
@@ -347,7 +354,7 @@ class TestTemplating(unittest.TestCase):
         self.assertTrue(isinstance(template, NullTemplate))
         self.assertTrue(template.context is self.context)
 
-    def test_doesnt_break_if_content_is_unmarked_when_template_is_emptied(self):
+    def test_doesnt_break_if_content_unmarked_when_template_is_emptied(self):
         relation = double(to_object='template object')
         self.templating.template = relation
         zope.interface.noLongerProvides(self.context, IHasTemplate)
