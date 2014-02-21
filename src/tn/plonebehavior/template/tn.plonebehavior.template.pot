@@ -4,7 +4,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
-"POT-Creation-Date: 2014-02-20 21:13+0000\n"
+"POT-Creation-Date: 2014-02-21 18:42+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI +ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -17,39 +17,47 @@ msgstr ""
 "Preferred-Encodings: utf-8 latin1\n"
 "Domain: tn.plonebehavior.template\n"
 
-#: tn/plonebehavior/template/__init__.py:43
+#: tn/plonebehavior/template/__init__.py:52
 msgid "CSS selector"
 msgstr ""
 
-#: tn/plonebehavior/template/html_page_html.py:41
+#: tn/plonebehavior/template/__init__.py:93
 msgid "Expression doesn't select a single element in the HTML page."
 msgstr ""
 
-#: tn/plonebehavior/template/__init__.py:35
+#: tn/plonebehavior/template/__init__.py:44
 msgid "HTML"
 msgstr ""
 
-#: tn/plonebehavior/template/__init__.py:176
+#: tn/plonebehavior/template/__init__.py:209
 msgid "Template"
 msgstr ""
 
-#: tn/plonebehavior/template/__init__.py:39
+#: tn/plonebehavior/template/__init__.py:48
 msgid "Template configuration"
 msgstr ""
 
-#: tn/plonebehavior/template/__init__.py:44
+#: tn/plonebehavior/template/__init__.py:37
+msgid "The CSS expression is invalid."
+msgstr ""
+
+#: tn/plonebehavior/template/__init__.py:53
 msgid "The CSS expression which selects the element where the content will go to."
 msgstr ""
 
-#: tn/plonebehavior/template/__init__.py:52
+#: tn/plonebehavior/template/__init__.py:62
 msgid "The XPath expression which selects the element where the content will go to.  A CSS expression will override this."
 msgstr ""
 
-#: tn/plonebehavior/template/__init__.py:177
+#: tn/plonebehavior/template/__init__.py:210
 msgid "The content item which will be the template for this one"
 msgstr ""
 
-#: tn/plonebehavior/template/__init__.py:51
+#: tn/plonebehavior/template/__init__.py:361
+msgid "Valid template not found. Edit this item and either assign a valid template or unassign the existing (invalid) one."
+msgstr ""
+
+#: tn/plonebehavior/template/__init__.py:61
 msgid "XPath selector"
 msgstr ""
 
