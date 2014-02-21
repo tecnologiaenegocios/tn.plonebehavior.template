@@ -1,8 +1,10 @@
 from five import grok
 from Products.CMFCore.utils import getToolByName
 from Products.Five import browser
+from Products.statusmessages.interfaces import IStatusMessage
 from persistent.dict import PersistentDict
 from plone.app.dexterity.behaviors.metadata import ICategorization
+from plone.dexterity.interfaces import IDexterityContent
 from plone.directives import form
 from plone.formwidget.contenttree.source import ObjPathSourceBinder
 from plone.supermodel import model
@@ -287,32 +289,17 @@ class Template(grok.Adapter):
         ).compile()
 
 
-class AssociatedTemplate(grok.Adapter):
-    """An associated template.
-
-    This object extracts a template from its context and delegates the
-    compilation task to it.
-
-    The context must have the ITemplating behavior active.
-    """
-    grok.context(IHasTemplate)
-    grok.implements(interfaces.ITemplate)
-
-    def compile(self, content):
-        template = self.get_template()
-        return template.compile(content)
-
-    def get_template(self):
-        possible_template = ITemplating(self.context).template_object
-        return interfaces.ITemplate(possible_template)
-
-
-class NullTemplate(object):
+class NullTemplate(grok.Adapter):
     """A null template.
 
     This kind of template just displays the content's body.  Delegates
     to a compilation strategy multi adapting the content and self.
+
+    The context has no participation in the compilation.
     """
+    grok.context(IDexterityContent)
+    grok.implements(interfaces.INullTemplate)
+
     def __init__(self, context):
         self.context = context
 
@@ -323,14 +310,34 @@ class NullTemplate(object):
         ).compile()
 
 
+class AssociatedTemplateCompilation(grok.Adapter):
+    """Compilation from associated template.
+
+    This object extracts a template from its context and delegates the
+    compilation task to it.
+
+    The context must have the ITemplateConfiguration behavior active.
+    """
+    grok.context(IHasTemplate)
+    grok.implements(interfaces.ICompilation)
+
+    def __unicode__(self):
+        return self.template.compile(self.context)
+
+    @property
+    def template(self):
+        possible_template = ITemplating(self.context).template_object
+        return interfaces.ITemplate(possible_template)
+
+
 class TemplatedView(grok.View):
     grok.context(IHasTemplate)
     grok.name('templated-view')
     grok.require('zope2.View')
 
     def render(self):
-        template = interfaces.ITemplate(self.context)
-        return template.compile(self.context)
+        compilation = interfaces.ICompilation(self.context)
+        return unicode(compilation)
 
 
 # This view is not automatically registered.
@@ -346,5 +353,15 @@ class DefaultView(browser.BrowserView):
         self.frame_id = u'frame-%s' % self.context.__name__
         self.javascript_url = base_resources_path + 'template.js'
         self.stylesheet_url = base_resources_path + 'template.css'
+
+        if IHasTemplate.providedBy(self.context):
+            compilation = interfaces.ICompilation(self.context)
+            if interfaces.INullTemplate.providedBy(compilation.template):
+                IStatusMessage(self.request).add(
+                    _(u'Valid template not found. Edit this item and either '
+                      u'assign a valid template or unassign the existing '
+                      u'(invalid) one.'),
+                    type='warning',
+                )
 
         return self.index()

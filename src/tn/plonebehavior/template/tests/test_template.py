@@ -2,7 +2,7 @@ from plone.app.dexterity.behaviors.metadata import ICategorization
 from plone.behavior.interfaces import IBehavior
 from stubydoo import double
 from stubydoo import stub
-from tn.plonebehavior.template import AssociatedTemplate
+from tn.plonebehavior.template import AssociatedTemplateCompilation
 from tn.plonebehavior.template import interfaces
 from tn.plonebehavior.template import IHasTemplate
 from tn.plonebehavior.template import INullTemplateConfiguration
@@ -209,7 +209,7 @@ class TestTemplateAdapter(unittest.TestCase):
 
 
 @stubydoo.assert_expectations
-class TestAssociatedTemplateAdapter(unittest.TestCase):
+class TestAssociatedTemplateCompilationAdapter(unittest.TestCase):
 
     def setUp(self):
         placelesssetup.setUp(self)
@@ -233,15 +233,14 @@ class TestAssociatedTemplateAdapter(unittest.TestCase):
             return template
         zope.component.provideAdapter(template_adapter)
 
-        self.content = double()
-        stub(template, 'compile').with_args(self.content).and_return(u'result')
+        stub(template, 'compile').with_args(self.context).and_return(u'result')
 
     def tearDown(self):
         placelesssetup.tearDown()
 
     def test_context_with_template_set(self):
         self.assertEquals(
-            AssociatedTemplate(self.context).compile(self.content),
+            unicode(AssociatedTemplateCompilation(self.context)),
             u'result'
         )
 
@@ -386,15 +385,14 @@ class TestTemplatedViewRendering(unittest.TestCase):
         placelesssetup.tearDown()
 
     def test_compiles_template_with_context(self):
-        template = double()
-        stubydoo.stub(template, 'compile').\
-                with_args(self.context).and_return(u'Compilation result')
+        compilation = double()
+        stubydoo.stub(compilation, '__unicode__').and_return(u'Result')
 
         @zope.component.adapter(None)
-        @zope.interface.implementer(interfaces.ITemplate)
-        def template_adapter(context):
-            return template
+        @zope.interface.implementer(interfaces.ICompilation)
+        def compilation_adapter(context):
+            return compilation
 
-        zope.component.provideAdapter(template_adapter)
+        zope.component.provideAdapter(compilation_adapter)
 
-        self.assertEquals(self.view.render(), u'Compilation result')
+        self.assertEquals(self.view.render(), u'Result')

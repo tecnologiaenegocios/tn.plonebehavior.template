@@ -18,12 +18,31 @@ class ITemplate(zope.interface.Interface):
         """
 
 
+class INullTemplate(ITemplate):
+    """A template which just outputs its inner content.
+
+    This can be used as a special case fallback when no valid template exists
+    but a valid template is expected.
+    """
+
+
 class ICompilationStrategy(zope.interface.Interface):
     """A template compiler
     """
 
     def compile():
         """Return the compilation result.
+        """
+
+
+class ICompilation(zope.interface.Interface):
+    """An object that wraps the result of compiling the object's template.
+    """
+
+    template = zope.interface.Attribute(u"The template used for compilation.")
+
+    def __unicode__():
+        """The compilation result as a unicode string.
         """
 
 
