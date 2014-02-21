@@ -62,3 +62,8 @@ class IHTMLBody(zope.interface.Interface):
     def __unicode__():
         """The inner content of the body tag as a unicode string.
         """
+
+
+class IBrowserLayer(zope.interface.Interface):
+    """A layer specific to this product.
+    """
