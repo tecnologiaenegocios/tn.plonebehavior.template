@@ -7,11 +7,14 @@ from plone.directives import form
 from plone.formwidget.contenttree.source import ObjPathSourceBinder
 from plone.supermodel import model
 from tn.plonebehavior.template import interfaces
+from z3c.form import validator
 from zope.annotation.interfaces import IAnnotations
 from zope.annotation.interfaces import IAttributeAnnotatable
 from zope.i18nmessageid import MessageFactory
 
+import collections
 import lxml.cssselect
+import lxml.html
 import z3c.relationfield
 import zope.component
 import zope.globalrequest
@@ -20,10 +23,17 @@ import zope.schema
 
 
 _ = MessageFactory('tn.plonebehavior.template')
-
-
+isiterable = lambda o: isinstance(o, collections.Iterable)
 template_configuration_key = 'tn.plonebehavior.template.TemplateConfiguration'
 templating_key = 'tn.plonebehavior.template.Templating'
+
+
+def _validate_css_selector(css_selector):
+    try:
+        lxml.cssselect.CSSSelector(css_selector)
+    except AssertionError:
+        raise zope.interface.Invalid(_(u'The CSS expression is invalid.'))
+    return True
 
 
 class ITemplateConfiguration(model.Schema):
@@ -40,6 +50,7 @@ class ITemplateConfiguration(model.Schema):
         title=_(u'CSS selector'),
         description=_(u'The CSS expression which selects the element where '
                       u'the content will go to.'),
+        constraint=_validate_css_selector,
         required=False
     )
 
@@ -54,6 +65,41 @@ class ITemplateConfiguration(model.Schema):
 
 
 zope.interface.alsoProvides(ITemplateConfiguration, form.IFormFieldProvider)
+
+
+def _validate_xpath_selector_within_html(html, xpath):
+    tree = lxml.html.document_fromstring(html)
+    selection = tree.xpath(xpath)
+    if not isiterable(selection) or len(selection) != 1:
+        return False
+    return True
+
+
+class CSSSelectorValidator(validator.StrictSimpleFieldValidator):
+    def validate(self, value):
+        super(CSSSelectorValidator, self).validate(value)
+
+        if not value:
+            return
+
+        html = interfaces.IHTML(self.context, None)
+        if html is None:
+            return
+
+        xpath = lxml.cssselect.CSSSelector(value).path
+        if not _validate_xpath_selector_within_html(unicode(html), xpath):
+            raise zope.interface.Invalid(_(
+                "Expression doesn't select a single element "
+                "in the HTML page."
+            ))
+
+
+validator.WidgetValidatorDiscriminators(
+    CSSSelectorValidator,
+    field=ITemplateConfiguration['css']
+)
+
+grok.global_adapter(CSSSelectorValidator)
 
 
 class INullTemplateConfiguration(ITemplateConfiguration):
