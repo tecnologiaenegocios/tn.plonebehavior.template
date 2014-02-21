@@ -4,7 +4,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
-"POT-Creation-Date: 2014-02-21 18:42+0000\n"
+"POT-Creation-Date: 2014-02-21 22:20+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI +ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -51,6 +51,10 @@ msgstr ""
 
 #: tn/plonebehavior/template/__init__.py:210
 msgid "The content item which will be the template for this one"
+msgstr ""
+
+#: tn/plonebehavior/template/html_page.py:41
+msgid "This item can be used as a template."
 msgstr ""
 
 #: tn/plonebehavior/template/__init__.py:361

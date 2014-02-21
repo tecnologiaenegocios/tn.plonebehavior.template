@@ -4,7 +4,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
-"POT-Creation-Date: 2014-02-21 18:42+0000\n"
+"POT-Creation-Date: 2014-02-21 22:20+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI +ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -52,6 +52,10 @@ msgstr "A expressão XPath que seleciona o elemento onde o conteúdo será inser
 #: tn/plonebehavior/template/__init__.py:210
 msgid "The content item which will be the template for this one"
 msgstr "O ítem de conteúdo que será o modelo para este"
+
+#: tn/plonebehavior/template/html_page.py:41
+msgid "This item can be used as a template."
+msgstr "Este ítem pode ser usado como um modelo."
 
 #: tn/plonebehavior/template/__init__.py:361
 msgid "Valid template not found. Edit this item and either assign a valid template or unassign the existing (invalid) one."
