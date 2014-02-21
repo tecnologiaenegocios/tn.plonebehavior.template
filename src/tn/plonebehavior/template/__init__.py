@@ -23,8 +23,6 @@ import zope.schema
 _ = MessageFactory('tn.plonebehavior.template')
 
 
-default_css_selector = u"#template-content"
-default_xpath_selector = lxml.cssselect.CSSSelector(default_css_selector).path
 template_configuration_key = 'tn.plonebehavior.template.TemplateConfiguration'
 templating_key = 'tn.plonebehavior.template.Templating'
 
@@ -57,18 +55,6 @@ class ITemplateConfiguration(model.Schema):
 
 
 zope.interface.alsoProvides(ITemplateConfiguration, form.IFormFieldProvider)
-
-
-grok.global_adapter(z3c.form.widget.StaticWidgetAttribute(
-    default_css_selector,
-    field=ITemplateConfiguration['css'],
-), name=u'default')
-
-
-grok.global_adapter(z3c.form.widget.StaticWidgetAttribute(
-    default_xpath_selector,
-    field=ITemplateConfiguration['xpath'],
-), name=u'default')
 
 
 class INullTemplateConfiguration(ITemplateConfiguration):
