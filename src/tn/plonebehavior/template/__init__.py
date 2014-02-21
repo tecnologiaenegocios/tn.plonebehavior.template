@@ -12,7 +12,6 @@ from zope.annotation.interfaces import IAttributeAnnotatable
 from zope.i18nmessageid import MessageFactory
 
 import lxml.cssselect
-import z3c.form.widget
 import z3c.relationfield
 import zope.component
 import zope.globalrequest
