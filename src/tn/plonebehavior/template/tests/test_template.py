@@ -48,41 +48,36 @@ class TestTemplateConfiguration(unittest.TestCase):
             return context._annotations
         zope.component.provideAdapter(annotations_adapter)
 
+        self.default_html = u'<html id="valid-id"></html>'
+
+        @zope.component.adapter(None)
+        @zope.interface.implementer(interfaces.IHTML)
+        def html_attribute_adapter(context):
+            return self.default_html
+        zope.component.provideAdapter(html_attribute_adapter)
+
     def tearDown(self):
         placelesssetup.tearDown()
 
     def test_use_adapter_for_html_attribute(self):
-        @zope.component.adapter(None)
-        @zope.interface.implementer(interfaces.IHTML)
-        def html_attribute_adapter(context):
-            return u'HTML Code'
-        zope.component.provideAdapter(html_attribute_adapter)
-
-        self.assertEquals(self.configuration.html, u'HTML Code')
+        self.assertEquals(self.configuration.html, self.default_html)
 
     def test_cannot_set_html_attribute(self):
-        @zope.component.adapter(None)
-        @zope.interface.implementer(interfaces.IHTML)
-        def html_attribute_adapter(context):
-            return u'HTML Code'
-        zope.component.provideAdapter(html_attribute_adapter)
-
         def set_attribute():
             self.configuration.html = u'Other HTML Code'
-
         self.assertRaises(AttributeError, set_attribute)
 
     def test_persists_xpath(self):
-        self.configuration.xpath = u'A XPath expression'
+        self.configuration.xpath = u'//a/xpath/expression'
 
         other_configuration = TemplateConfiguration(self.context)
-        self.assertEquals(other_configuration.xpath, u'A XPath expression')
+        self.assertEquals(other_configuration.xpath, u'//a/xpath/expression')
 
     def test_persists_css(self):
-        self.configuration.css = u'#other-id'
+        self.configuration.css = u'a css selector'
 
         other_configuration = TemplateConfiguration(self.context)
-        self.assertEquals(other_configuration.css, u'#other-id')
+        self.assertEquals(other_configuration.css, u'a css selector')
 
     def test_css_sets_xpath(self):
         self.configuration.css = u'#other-id'
@@ -91,32 +86,36 @@ class TestTemplateConfiguration(unittest.TestCase):
         self.assertEquals(other_configuration.xpath,
                           u"descendant-or-self::*[@id = 'other-id']")
 
-    def test_marks_the_content_when_xpath_is_set(self):
-        self.configuration.xpath = 'a Xpath expression'
+    def test_marks_the_content_when_xpath_is_valid(self):
+        self.configuration.xpath = u"descendant-or-self::*[@id = 'valid-id']"
         self.assertTrue(IPossibleTemplate in providedBy(self.context))
 
+    def test_unmarks_the_content_when_xpath_is_not_valid(self):
+        self.configuration.xpath = u"descendant-or-self::*[@id = 'other-id']"
+        self.assertTrue(IPossibleTemplate not in providedBy(self.context))
+
     def test_unmarks_the_content_when_xpath_is_emptied(self):
-        self.configuration.xpath = 'a XPath expression'
+        self.configuration.xpath = u"descendant-or-self::*[@id = 'valid-id']"
         self.configuration.xpath = None
         self.assertTrue(IPossibleTemplate not in providedBy(self.context))
 
     def test_doesnt_break_if_content_is_unmarked_when_xpath_is_emptied(self):
-        self.configuration.xpath = 'a XPath expression'
+        self.configuration.xpath = u"descendant-or-self::*[@id = 'valid-id']"
         zope.interface.noLongerProvides(self.context, IPossibleTemplate)
         self.configuration.xpath = None
         self.assertTrue(IPossibleTemplate not in providedBy(self.context))
 
     def test_marks_the_content_when_css_is_set(self):
-        self.configuration.css = 'a CSS expression'
+        self.configuration.css = '#valid-id'
         self.assertTrue(IPossibleTemplate in providedBy(self.context))
 
     def test_unmarks_the_content_when_css_is_emptied(self):
-        self.configuration.css = 'a CSS expression'
+        self.configuration.css = '#valid-id'
         self.configuration.css = None
         self.assertTrue(IPossibleTemplate not in providedBy(self.context))
 
     def test_doesnt_break_if_content_is_unmarked_when_css_is_emptied(self):
-        self.configuration.css = 'a CSS expression'
+        self.configuration.css = '#valid-id'
         zope.interface.noLongerProvides(self.context, IPossibleTemplate)
         self.configuration.css = None
         self.assertTrue(IPossibleTemplate not in providedBy(self.context))

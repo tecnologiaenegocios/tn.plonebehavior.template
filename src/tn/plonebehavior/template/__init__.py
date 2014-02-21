@@ -126,7 +126,7 @@ class TemplateConfiguration(object):
 
     @xpath.setter
     def xpath(self, value):
-        if value:
+        if value and _validate_xpath_selector_within_html(self.html, value):
             zope.interface.alsoProvides(self.context,
                                         interfaces.IPossibleTemplate)
         else:
