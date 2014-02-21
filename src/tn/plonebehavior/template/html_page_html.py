@@ -34,6 +34,9 @@ if HAS_HTML_PAGE:
         def validate(self, value):
             super(CSSSelectorValidator, self).validate(value)
 
+            if not value:
+                return True
+
             tree = lxml.html.document_fromstring(self.context.html)
             xpath = lxml.cssselect.CSSSelector(value).path
             selection = tree.xpath(xpath)
