@@ -4,7 +4,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
-"POT-Creation-Date: 2014-02-21 22:20+0000\n"
+"POT-Creation-Date: 2014-02-24 23:54+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI +ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -17,51 +17,51 @@ msgstr ""
 "Preferred-Encodings: utf-8 latin1\n"
 "Domain: tn.plonebehavior.template\n"
 
-#: tn/plonebehavior/template/__init__.py:52
+#: tn/plonebehavior/template/__init__.py:56
 msgid "CSS selector"
 msgstr "Seletor CSS"
 
-#: tn/plonebehavior/template/__init__.py:93
-msgid "Expression doesn't select a single element in the HTML page."
-msgstr "Expressão não seleciona um único elemento na página HTML."
-
-#: tn/plonebehavior/template/__init__.py:44
+#: tn/plonebehavior/template/__init__.py:48
 msgid "HTML"
 msgstr "HTML"
 
-#: tn/plonebehavior/template/__init__.py:209
+#: tn/plonebehavior/template/__init__.py:196
 msgid "Template"
 msgstr "Modelo"
 
-#: tn/plonebehavior/template/__init__.py:48
+#: tn/plonebehavior/template/__init__.py:52
 msgid "Template configuration"
 msgstr "Configuração de modelo"
 
-#: tn/plonebehavior/template/__init__.py:37
+#: tn/plonebehavior/template/__init__.py:41
 msgid "The CSS expression is invalid."
 msgstr "A expressão CSS é inválida."
 
-#: tn/plonebehavior/template/__init__.py:53
+#: tn/plonebehavior/template/__init__.py:57
 msgid "The CSS expression which selects the element where the content will go to."
 msgstr "A expressão CSS que seleciona o elemento onde o conteúdo será inserido."
 
-#: tn/plonebehavior/template/__init__.py:62
+#: tn/plonebehavior/template/__init__.py:66
 msgid "The XPath expression which selects the element where the content will go to.  A CSS expression will override this."
 msgstr "A expressão XPath que seleciona o elemento onde o conteúdo será inserido.  Uma expressão CSS irá sobrescrever isto."
 
-#: tn/plonebehavior/template/__init__.py:210
+#: tn/plonebehavior/template/__init__.py:197
 msgid "The content item which will be the template for this one"
 msgstr "O ítem de conteúdo que será o modelo para este"
 
-#: tn/plonebehavior/template/html_page.py:41
+#: tn/plonebehavior/template/html_page.py:80
 msgid "This item can be used as a template."
 msgstr "Este ítem pode ser usado como um modelo."
 
-#: tn/plonebehavior/template/__init__.py:361
+#: tn/plonebehavior/template/html_page.py:65
+msgid "This item has a selector set for usage as a template, but the selector doesn't match a single HTML element. If you really wish to use this item as a template, edit it and modify the selector in the Template configuration tab or the HTML code to make them match. If instead you wish this item to be a regular HTML page, edit it, go to the Template configuration tab, and leave the selector field in blank."
+msgstr "Este ítem possui um seletor configurado para uso como um modelo, mas o seletor não casa com um único elemento HTML. Se você realmente deseja usar este ítem como um modelo, edite-o e modifique o seletor na aba Configuração de modelo ou o código HTML para fazê-los casarem. Se ao invés você deseja que este ítem seja uma página HTML regular, edite-o, vá até a aba Configuração de modelo e deixe o campo seletor em branco."
+
+#: tn/plonebehavior/template/__init__.py:348
 msgid "Valid template not found. Edit this item and either assign a valid template or unassign the existing (invalid) one."
 msgstr "Modelo válido não encontrado.  Edite este ítem e associe-o a um modelo válido ou desassocie-o do modelo existente (inválido)."
 
-#: tn/plonebehavior/template/__init__.py:61
+#: tn/plonebehavior/template/__init__.py:65
 msgid "XPath selector"
 msgstr "Seletor XPath"
 

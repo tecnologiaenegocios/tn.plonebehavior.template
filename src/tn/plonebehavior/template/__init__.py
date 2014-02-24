@@ -9,10 +9,14 @@ from plone.directives import form
 from plone.formwidget.contenttree.source import ObjPathSourceBinder
 from plone.supermodel import model
 from tn.plonebehavior.template import interfaces
-from z3c.form import validator
+# from z3c.form import validator
 from zope.annotation.interfaces import IAnnotations
 from zope.annotation.interfaces import IAttributeAnnotatable
 from zope.i18nmessageid import MessageFactory
+from zope.lifecycleevent import ObjectModifiedEvent
+from zope.lifecycleevent.interfaces import IObjectCreatedEvent
+from zope.lifecycleevent.interfaces import IObjectModifiedEvent
+from zope.event import notify
 
 import collections
 import lxml.cssselect
@@ -69,41 +73,6 @@ class ITemplateConfiguration(model.Schema):
 zope.interface.alsoProvides(ITemplateConfiguration, form.IFormFieldProvider)
 
 
-def _validate_xpath_selector_within_html(html, xpath):
-    tree = lxml.html.document_fromstring(html)
-    selection = tree.xpath(xpath)
-    if not isiterable(selection) or len(selection) != 1:
-        return False
-    return True
-
-
-class CSSSelectorValidator(validator.StrictSimpleFieldValidator):
-    def validate(self, value):
-        super(CSSSelectorValidator, self).validate(value)
-
-        if not value:
-            return
-
-        html = interfaces.IHTML(self.context, None)
-        if html is None:
-            return
-
-        xpath = lxml.cssselect.CSSSelector(value).path
-        if not _validate_xpath_selector_within_html(unicode(html), xpath):
-            raise zope.interface.Invalid(_(
-                "Expression doesn't select a single element "
-                "in the HTML page."
-            ))
-
-
-validator.WidgetValidatorDiscriminators(
-    CSSSelectorValidator,
-    field=ITemplateConfiguration['css']
-)
-
-grok.global_adapter(CSSSelectorValidator)
-
-
 class INullTemplateConfiguration(ITemplateConfiguration):
     """A template configuration for null templates.
     """
@@ -128,7 +97,7 @@ class TemplateConfiguration(object):
 
     @xpath.setter
     def xpath(self, value):
-        if value and _validate_xpath_selector_within_html(self.html, value):
+        if value:
             zope.interface.alsoProvides(self.context,
                                         interfaces.IPossibleTemplate)
         else:
@@ -159,6 +128,24 @@ class TemplateConfiguration(object):
 possibleTemplates = ObjPathSourceBinder(**dict(
     object_provides=interfaces.IPossibleTemplate.__identifier__
 ))
+
+
+def html_contains_xpath_single(html, xpath):
+    tree = lxml.html.document_fromstring(html)
+    selection = tree.xpath(xpath)
+    if not isiterable(selection) or len(selection) != 1:
+        return False
+    return True
+
+
+@grok.subscribe(interfaces.IPossibleTemplate, IObjectCreatedEvent)
+@grok.subscribe(interfaces.IPossibleTemplate, IObjectModifiedEvent)
+def assert_content_is_possible_template(object, event):
+    config = ITemplateConfiguration(object)
+    if not html_contains_xpath_single(config.html, config.xpath):
+        # This item is not really a possible template.  Let's unmark it.
+        zope.interface.noLongerProvides(object, interfaces.IPossibleTemplate)
+        notify(ObjectModifiedEvent(object))
 
 
 class NullTemplateConfiguration(object):

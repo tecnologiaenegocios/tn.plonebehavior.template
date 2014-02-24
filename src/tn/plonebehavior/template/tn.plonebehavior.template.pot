@@ -4,7 +4,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
-"POT-Creation-Date: 2014-02-21 22:20+0000\n"
+"POT-Creation-Date: 2014-02-24 23:54+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI +ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -17,51 +17,51 @@ msgstr ""
 "Preferred-Encodings: utf-8 latin1\n"
 "Domain: tn.plonebehavior.template\n"
 
-#: tn/plonebehavior/template/__init__.py:52
+#: tn/plonebehavior/template/__init__.py:56
 msgid "CSS selector"
 msgstr ""
 
-#: tn/plonebehavior/template/__init__.py:93
-msgid "Expression doesn't select a single element in the HTML page."
-msgstr ""
-
-#: tn/plonebehavior/template/__init__.py:44
+#: tn/plonebehavior/template/__init__.py:48
 msgid "HTML"
 msgstr ""
 
-#: tn/plonebehavior/template/__init__.py:209
+#: tn/plonebehavior/template/__init__.py:196
 msgid "Template"
 msgstr ""
 
-#: tn/plonebehavior/template/__init__.py:48
+#: tn/plonebehavior/template/__init__.py:52
 msgid "Template configuration"
 msgstr ""
 
-#: tn/plonebehavior/template/__init__.py:37
+#: tn/plonebehavior/template/__init__.py:41
 msgid "The CSS expression is invalid."
 msgstr ""
 
-#: tn/plonebehavior/template/__init__.py:53
+#: tn/plonebehavior/template/__init__.py:57
 msgid "The CSS expression which selects the element where the content will go to."
 msgstr ""
 
-#: tn/plonebehavior/template/__init__.py:62
+#: tn/plonebehavior/template/__init__.py:66
 msgid "The XPath expression which selects the element where the content will go to.  A CSS expression will override this."
 msgstr ""
 
-#: tn/plonebehavior/template/__init__.py:210
+#: tn/plonebehavior/template/__init__.py:197
 msgid "The content item which will be the template for this one"
 msgstr ""
 
-#: tn/plonebehavior/template/html_page.py:41
+#: tn/plonebehavior/template/html_page.py:80
 msgid "This item can be used as a template."
 msgstr ""
 
-#: tn/plonebehavior/template/__init__.py:361
+#: tn/plonebehavior/template/html_page.py:65
+msgid "This item has a selector set for usage as a template, but the selector doesn't match a single HTML element. If you really wish to use this item as a template, edit it and modify the selector in the Template configuration tab or the HTML code to make them match. If instead you wish this item to be a regular HTML page, edit it, go to the Template configuration tab, and leave the selector field in blank."
+msgstr ""
+
+#: tn/plonebehavior/template/__init__.py:348
 msgid "Valid template not found. Edit this item and either assign a valid template or unassign the existing (invalid) one."
 msgstr ""
 
-#: tn/plonebehavior/template/__init__.py:61
+#: tn/plonebehavior/template/__init__.py:65
 msgid "XPath selector"
 msgstr ""
 

@@ -48,7 +48,7 @@ class TestTemplateConfiguration(unittest.TestCase):
             return context._annotations
         zope.component.provideAdapter(annotations_adapter)
 
-        self.default_html = u'<html id="valid-id"></html>'
+        self.default_html = u'<html id="selector"></html>'
 
         @zope.component.adapter(None)
         @zope.interface.implementer(interfaces.IHTML)
@@ -87,35 +87,31 @@ class TestTemplateConfiguration(unittest.TestCase):
                           u"descendant-or-self::*[@id = 'other-id']")
 
     def test_marks_the_content_when_xpath_is_valid(self):
-        self.configuration.xpath = u"descendant-or-self::*[@id = 'valid-id']"
+        self.configuration.xpath = u"descendant-or-self::*[@id = 'selector']"
         self.assertTrue(IPossibleTemplate in providedBy(self.context))
 
-    def test_unmarks_the_content_when_xpath_is_not_valid(self):
-        self.configuration.xpath = u"descendant-or-self::*[@id = 'other-id']"
-        self.assertTrue(IPossibleTemplate not in providedBy(self.context))
-
     def test_unmarks_the_content_when_xpath_is_emptied(self):
-        self.configuration.xpath = u"descendant-or-self::*[@id = 'valid-id']"
+        self.configuration.xpath = u"descendant-or-self::*[@id = 'selector']"
         self.configuration.xpath = None
         self.assertTrue(IPossibleTemplate not in providedBy(self.context))
 
     def test_doesnt_break_if_content_is_unmarked_when_xpath_is_emptied(self):
-        self.configuration.xpath = u"descendant-or-self::*[@id = 'valid-id']"
+        self.configuration.xpath = u"descendant-or-self::*[@id = 'selector']"
         zope.interface.noLongerProvides(self.context, IPossibleTemplate)
         self.configuration.xpath = None
         self.assertTrue(IPossibleTemplate not in providedBy(self.context))
 
     def test_marks_the_content_when_css_is_set(self):
-        self.configuration.css = '#valid-id'
+        self.configuration.css = '#selector'
         self.assertTrue(IPossibleTemplate in providedBy(self.context))
 
     def test_unmarks_the_content_when_css_is_emptied(self):
-        self.configuration.css = '#valid-id'
+        self.configuration.css = '#selector'
         self.configuration.css = None
         self.assertTrue(IPossibleTemplate not in providedBy(self.context))
 
     def test_doesnt_break_if_content_is_unmarked_when_css_is_emptied(self):
-        self.configuration.css = '#valid-id'
+        self.configuration.css = '#selector'
         zope.interface.noLongerProvides(self.context, IPossibleTemplate)
         self.configuration.css = None
         self.assertTrue(IPossibleTemplate not in providedBy(self.context))
