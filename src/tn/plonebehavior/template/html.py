@@ -13,5 +13,14 @@ class ContextlessHTML(object):
 
     def __unicode__(self):
         tree = lxml.html.fromstring(self.html)
-        tree.make_links_absolute(self.base_url)
+        absolutize_links(tree, self.base_url)
         return lxml.html.tostring(tree)
+
+
+def absolutize_links(tree, base_href):
+    def _keep_anchors(link):
+        if link.startswith(base_href + '#'):
+            # Make internal anchors be just internal anchors.
+            return '#'.join([''] + link.split('#')[1:])
+        return link
+    tree.rewrite_links(_keep_anchors, base_href=base_href)
