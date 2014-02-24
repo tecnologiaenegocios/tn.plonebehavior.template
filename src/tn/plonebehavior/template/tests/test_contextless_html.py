@@ -64,7 +64,7 @@ class TestContextlessHTML(unittest.TestCase):
                 <a href="%(folder_url)spage.html">Page</a>
                 <a href="mailto:bob@example.com">Send me spam!</a>
                 <a href="javascript:alert('Hacked!');">Hack me!</a>
-                <a href="%(full_url)s#anchor">Anchor</a>
+                <a href="#anchor">Anchor</a>
                 <a href="%(folder_url)spath/file.pdf">File</a>
                 <a href="%(host_url)sfile.pdf">File</a>
                 <div style="background-image: url('%(folder_url)simage.png');">
@@ -72,7 +72,6 @@ class TestContextlessHTML(unittest.TestCase):
                 </div>
             </body>
         </html>''' % dict(folder_url=self.folder_url,
-                          full_url=self.context_url,
                           host_url=self.host_url)))
 
         contextless_html = ContextlessHTML(self.context_url, html)
