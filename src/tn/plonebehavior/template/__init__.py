@@ -9,7 +9,6 @@ from plone.directives import form
 from plone.formwidget.contenttree.source import ObjPathSourceBinder
 from plone.supermodel import model
 from tn.plonebehavior.template import interfaces
-# from z3c.form import validator
 from zope.annotation.interfaces import IAnnotations
 from zope.annotation.interfaces import IAttributeAnnotatable
 from zope.i18nmessageid import MessageFactory
