@@ -21,8 +21,9 @@ class ITemplate(zope.interface.Interface):
 class INullTemplate(ITemplate):
     """A template which just outputs its inner content.
 
-    This can be used as a special case fallback when no valid template exists
-    but a valid template is expected.
+    This can be used as a special case fallback when a content item has no
+    template associated with it or the template is not found or invalid, but a
+    valid template is expected.
     """
 
 

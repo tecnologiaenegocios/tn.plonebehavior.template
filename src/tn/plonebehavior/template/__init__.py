@@ -302,9 +302,9 @@ class AssociatedTemplateCompilation(grok.Adapter):
     This object extracts a template from its context and delegates the
     compilation task to it.
 
-    The context must have the ITemplateConfiguration behavior active.
+    The context must have the ITemplating behavior active.
     """
-    grok.context(IHasTemplate)
+    grok.context(IDexterityContent)
     grok.implements(interfaces.ICompilation)
 
     def __unicode__(self):
